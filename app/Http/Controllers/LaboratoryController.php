@@ -7,14 +7,30 @@ use Illuminate\Http\Request;
 
 class LaboratoryController extends Controller
 {
-    // Show the Faculty Dashboard (Gina will build the view later)
-    public function facultyIndex()
+    public function studentIndex(Request $request)
     {
-        $laboratories = Laboratory::all();
-        return view('faculty.dashboard', compact('laboratories'));
+        $search = $request->input('search');
+
+        $laboratories = Laboratory::when($search, function ($query, $search) {
+            return $query->where('lab_name', 'like', "%{$search}%")
+                         ->orWhere('section_name', 'like', "%{$search}%");
+        })->get();
+
+        return view('dashboard', compact('laboratories'));
     }
 
-    // This is the function that actually updates the status
+    public function facultyIndex(Request $request)
+    {
+        $search = $request->input('search');
+
+        $laboratories = Laboratory::when($search, function ($query, $search) {
+            return $query->where('lab_name', 'like', "%{$search}%")
+                         ->orWhere('section_name', 'like', "%{$search}%");
+        })->get();
+
+        return view('faculty.dashboard', compact('laboratories'));
+    }
+    
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
@@ -26,7 +42,6 @@ class LaboratoryController extends Controller
         
         $lab->update([
             'status' => $request->status,
-            // If status is Available, we clear the section name automatically
             'section_name' => ($request->status === 'Available') ? null : $request->section_name,
             'updated_by_faculty_id' => auth()->id(),
         ]);
