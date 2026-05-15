@@ -18,12 +18,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-// Route for Students (The default dashboard)
-Route::get('/dashboard', function () {
-    $laboratories = Laboratory::all();
-    return view('dashboard', compact('laboratories'));
-})->middleware(['auth', 'verified'])->name('dashboard');
-
+// Change the old closure route to use the Controller method
+Route::get('/dashboard', [LaboratoryController::class, 'studentIndex'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 // Routes for Faculty (Protected by Lorraine's Middleware)
 Route::middleware(['auth', 'is_faculty'])->group(function () {
     Route::get('/faculty/dashboard', [LaboratoryController::class, 'facultyIndex'])->name('faculty.dashboard');

@@ -6,6 +6,16 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white p-6 shadow-sm sm:rounded-lg">
+                <div class="mb-4">
+    <form action="{{ route('faculty.dashboard') }}" method="GET" class="flex gap-2">
+        <input type="text" name="search" value="{{ request('search') }}" 
+               placeholder="Filter by Lab or Section..." 
+               class="border-gray-300 rounded-md shadow-sm focus:ring-blue-500">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md">
+            Filter
+        </button>
+    </form>
+</div>
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b bg-gray-50">
