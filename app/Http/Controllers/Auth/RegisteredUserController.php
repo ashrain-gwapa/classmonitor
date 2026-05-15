@@ -20,36 +20,29 @@ class RegisteredUserController extends Controller
     }
 
     public function store(Request $request): RedirectResponse
-    {
-        // Validate custom input constraints
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'school_id' => ['required', 'string', 'max:50', 'unique:'.User::class],
-            'role' => ['required', 'in:student,faculty'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+{
+    $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+        'school_id' => ['required', 'string', 'max:50', 'unique:'.User::class],
+        'role' => ['required', 'in:student,faculty'],
+        'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+    ]);
 
-        // Create the user account entry
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'school_id' => $request->school_id,
-            'role' => $request->role,
-            // Students can log in immediately. Faculty must wait for verification default to false.
-            'is_verified' => $request->role === 'student' ? true : false, 
-            'password' => Hash::make($request->password),
-        ]);
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'school_id' => $request->school_id,
+        'role' => $request->role,
+        'is_verified' => $request->role === 'student' ? true : false, 
+        'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+    ]);
 
-        event(new Registered($user));
+    event(new \Illuminate\Auth\Events\Registered($user));
+    \Illuminate\Support\Facades\Auth::login($user);
 
-        Auth::login($user);
-
-        // Redirect based on role status
-        if ($user->role === 'faculty') {
-            return redirect('/faculty/dashboard');
-        }
-
-        return redirect('/dashboard');
-    }
+    return ($user->role === 'faculty') 
+        ? redirect('/faculty/dashboard') 
+        : redirect('/dashboard');
+}
 }
