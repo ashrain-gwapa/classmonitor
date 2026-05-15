@@ -11,11 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Registering your security middleware alias tag here
-        $middleware->alias([
-            'is_faculty' => \App\Http\Middleware\IsFaculty::class,
-        ]);
-    })
+    $middleware->alias([
+        'is_faculty' => \App\Http\Middleware\IsFaculty::class,
+    ]);
+})
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

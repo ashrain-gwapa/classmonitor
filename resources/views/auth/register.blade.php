@@ -16,23 +16,18 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- School ID Element -->
-<div class="mt-4">
-    <x-input-label for="school_id" :value="__('School ID / Institutional ID')" />
-    <x-text-input id="school_id" class="block mt-1 w-full" type="text" name="school_id" :value="old('school_id')" required autocomplete="school_id" />
-    <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+       <div class="mt-4">
+    <x-input-label for="school_id" :value="__('School ID')" />
+    <x-text-input id="school_id" class="block mt-1 w-full" type="text" name="school_id" required />
 </div>
 
-<!-- Account Designation Selection Dropdown -->
 <div class="mt-4">
-    <x-input-label for="role" :value="__('Register Account Designation As:')" />
-    <select id="role" name="role" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-        <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student (View Only Tracker)</option>
-        <option value="faculty" {{ old('role') == 'faculty' ? 'selected' : '' }}>Faculty Member (Management Dashboard)</option>
+    <x-input-label for="role" :value="__('Register As')" />
+    <select name="role" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
+        <option value="student">Student</option>
+        <option value="faculty">Faculty</option>
     </select>
-    <x-input-error :messages="$errors->get('role')" class="mt-2" />
 </div>
-
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
