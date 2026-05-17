@@ -24,25 +24,23 @@ class RegisteredUserController extends Controller
     $request->validate([
         'name' => ['required', 'string', 'max:255'],
         'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-        'school_id' => ['required', 'string', 'max:50', 'unique:'.User::class],
-        'role' => ['required', 'in:student,faculty'],
-        'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+        'school_id' => ['required', 'string', 'max:50', 'unique:'.User::class], // Add this
+        'role' => ['required', 'in:student,faculty'], // Add this
+        'password' => ['required', 'confirmed', Rules\Password::defaults()],
     ]);
 
     $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
-        'school_id' => $request->school_id,
-        'role' => $request->role,
-        'is_verified' => $request->role === 'student' ? true : false, 
-        'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+        'school_id' => $request->school_id, // Add this
+        'role' => $request->role,           // Add this
+        'is_verified' => $request->role === 'student', // Students are auto-verified, Faculty are not
+        'password' => Hash::make($request->password),
     ]);
 
-    event(new \Illuminate\Auth\Events\Registered($user));
-    \Illuminate\Support\Facades\Auth::login($user);
+    event(new Registered($user));
+    Auth::login($user);
 
-    return ($user->role === 'faculty') 
-        ? redirect('/faculty/dashboard') 
-        : redirect('/dashboard');
+    return redirect(route('dashboard', absolute: false));
 }
 }

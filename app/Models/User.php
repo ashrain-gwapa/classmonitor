@@ -10,13 +10,13 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = [
+   protected $fillable = [
     'name',
     'email',
     'password',
-    'school_id',
-    'role',
-    'is_verified',
+    'school_id',  // Must be here
+    'role',       // Must be here
+
 ];
 
 protected function casts(): array
