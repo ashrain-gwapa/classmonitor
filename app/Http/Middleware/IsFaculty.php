@@ -14,9 +14,9 @@ class IsFaculty
         return redirect()->route('login');
     }
 
-    if (auth()->user()->role !== 'faculty' || !auth()->user()->is_verified) {
-        abort(403, 'Unauthorized. Faculty verification required.');
-    }
+   if (auth()->user()->is_verified != 1) {
+    abort(403, 'UNAUTHORIZED. FACULTY VERIFICATION REQUIRED.');
+}
 
     return $next($request);
 }

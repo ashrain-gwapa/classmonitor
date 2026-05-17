@@ -13,7 +13,7 @@ return new class extends Migration
         $table->string('name');
         $table->string('email')->unique();
         $table->string('school_id')->unique(); // For identity verification
-        $table->enum('role', ['student', 'faculty'])->default('student'); 
+       $table->string('role')->default('student');
         $table->boolean('is_verified')->default(false); 
         $table->timestamp('email_verified_at')->nullable();
         $table->string('password');

@@ -14,33 +14,51 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
+    /**
+     * Display the registration view.
+     */
     public function create(): View
     {
         return view('auth.register');
     }
 
+    /**
+     * Handle an incoming registration request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function store(Request $request): RedirectResponse
-{
-    $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-        'school_id' => ['required', 'string', 'max:50', 'unique:'.User::class], // Add this
-        'role' => ['required', 'in:student,faculty'], // Add this
-        'password' => ['required', 'confirmed', Rules\Password::defaults()],
-    ]);
+    {
+        // 1. Validate the incoming input fields from the form
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'school_id' => ['required', 'string', 'max:50', 'unique:'.User::class], 
+            'role' => ['required', 'in:student,faculty'], // Restricts form options to student or faculty only
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
 
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'school_id' => $request->school_id, // Add this
-        'role' => $request->role,           // Add this
-        'is_verified' => $request->role === 'student', // Students are auto-verified, Faculty are not
-        'password' => Hash::make($request->password),
-    ]);
+        // SAFE GUARD: Force assignment values to completely prevent admin signup injection spoofing
+        $assignedRole = $request->role;
+        if ($assignedRole === 'admin') {
+            $assignedRole = 'student'; 
+        }
 
-    event(new Registered($user));
-    Auth::login($user);
+        // 2. Create the user database record
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'school_id' => $request->school_id, 
+            'role' => $assignedRole, // Uses the safe, sanitized role value         
+            'is_verified' => 1, 
+            'password' => Hash::make($request->password),
+        ]);
 
-    return redirect(route('dashboard', absolute: false));
-}
+        event(new Registered($user));
+
+        // 🛑 REMOVED: Auth::login($user); <--- Unchanged, keeps user from auto-logging in.
+
+        // 3. Redirect everyone to the login page with a flash message
+        return redirect()->route('login')->with('status', 'Registration successful! Please log in to access your account.');
+    }
 }
